@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { Grid, Typography, Container, Box, FormControl, InputLabel, Select, MenuItem, Pagination, CircularProgress } from '@mui/material';
+import { Grid, Typography, Container, Box, FormControl, InputLabel, Select, MenuItem, CircularProgress } from '@mui/material';
 import ProductCard from '../components/ProductCard';
 import '../App.css';
 
 function Shop({ products, addToCart, loading }) {
   const [categoryFilter, setCategoryFilter] = React.useState('all');
-  const [page, setPage] = React.useState(1);
   const [animatedCards, setAnimatedCards] = React.useState([]); // Track animated card indices
-  const itemsPerPage = 15;
+  const [visibleProducts, setVisibleProducts] = React.useState(15); // Number of products to show initially
 
   // Capitalize the first letter of each category
   const capitalizeCategory = category => category.charAt(0).toUpperCase() + category.slice(1);
@@ -16,20 +15,11 @@ function Shop({ products, addToCart, loading }) {
 
   const filteredProducts = categoryFilter === 'all' ? products : products.filter(product => capitalizeCategory(product.category) === categoryFilter);
 
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  const startIndex = (page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const productsToShow = filteredProducts.slice(startIndex, endIndex);
-
-  const handlePageChange = (event, value) => {
-    setPage(value);
-    setAnimatedCards([]); // Reset animations when page changes
-  };
+  const productsToShow = filteredProducts.slice(0, visibleProducts);
 
   const handleCategoryChange = event => {
     setCategoryFilter(event.target.value);
-    setPage(1);
+    setVisibleProducts(15); // Reset visible products when category changes
     setAnimatedCards([]); // Reset animations when category changes
   };
 
@@ -41,6 +31,21 @@ function Shop({ products, addToCart, loading }) {
 
     return () => clearTimeout(timer);
   }, [productsToShow]);
+
+  // Infinite scroll logic
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+      // Load more products when the user is near the bottom
+      if (scrollTop + clientHeight >= scrollHeight - 100 && visibleProducts < filteredProducts.length) {
+        setVisibleProducts(prev => prev + 15); // Load 15 more products
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visibleProducts, filteredProducts.length]);
 
   if (loading) {
     return (
@@ -89,9 +94,12 @@ function Shop({ products, addToCart, loading }) {
         ))}
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 3 }}>
-        <Pagination count={pageCount} page={page} onChange={handlePageChange} color="primary" />
-      </Box>
+      {/* Show loading spinner when more products are being loaded */}
+      {visibleProducts < filteredProducts.length && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, mb: 3 }}>
+          <CircularProgress />
+        </Box>
+      )}
     </Container>
   );
 }

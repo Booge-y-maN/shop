@@ -158,6 +158,112 @@ function Home({ products, addToCart, error, loading }) {
           SHOW MORE
         </Button>
       </Box>
+
+      {/* Stats Section */}
+      <Box
+        sx={{
+          backgroundColor: '#f5f5f5',
+          py: 6,
+          mt: 6,
+          textAlign: 'center',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={2}> {/* Reduced spacing between grid items */}
+            {/* Products and Suppliers */}
+            <Grid item xs={12} sm={6} md={6}>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 700,
+                  color: '#FF6A00',
+                  fontFamily: '"Playfair Display", serif', // Classic font for numbers
+                }}
+              >
+                100M+
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#333',
+                  mt: 1,
+                  fontFamily: '"Lato", sans-serif', // Clean font for labels
+                }}
+              >
+                Products
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 700,
+                  color: '#FF6A00',
+                  fontFamily: '"Playfair Display", serif',
+                }}
+              >
+                150K+
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#333',
+                  mt: 1,
+                  fontFamily: '"Lato", sans-serif',
+                }}
+              >
+                Suppliers
+              </Typography>
+            </Grid>
+
+            {/* Product Categories and Countries */}
+            <Grid item xs={12} sm={6} md={6}>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 700,
+                  color: '#FF6A00',
+                  fontFamily: '"Playfair Display", serif',
+                }}
+              >
+                3,700
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#333',
+                  mt: 1,
+                  fontFamily: '"Lato", sans-serif',
+                }}
+              >
+                Product Categories
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 700,
+                  color: '#FF6A00',
+                  fontFamily: '"Playfair Display", serif',
+                }}
+              >
+                200+
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#333',
+                  mt: 1,
+                  fontFamily: '"Lato", sans-serif',
+                }}
+              >
+                Countries and Regions
+              </Typography>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
     </Box>
   );
 }
