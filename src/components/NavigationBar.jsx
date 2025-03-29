@@ -13,6 +13,7 @@ import {
   Box,
   CircularProgress,
   Popover,
+  Divider,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
@@ -23,8 +24,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchResults from './SearchResults';
 import { debounce } from 'lodash';
-import GoogleIcon from '@mui/icons-material/Google'; // Google logo
-import FacebookIcon from '@mui/icons-material/Facebook'; // Facebook logo
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
 
 function NavigationBar({ cartItemCount }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -35,9 +36,14 @@ function NavigationBar({ cartItemCount }) {
   const [languageAnchorEl, setLanguageAnchorEl] = React.useState(null);
   const [isSearchExpanded, setIsSearchExpanded] = React.useState(false);
   const [selectedLanguage, setSelectedLanguage] = React.useState('En-US');
-  const [isHovered, setIsHovered] = React.useState(false); // For Person Icon hover
+  const [isPersonHovered, setIsPersonHovered] = React.useState(false);
+  const [isCartHovered, setIsCartHovered] = React.useState(false);
   const searchBarRef = React.useRef(null);
   const searchResultsRef = React.useRef(null);
+  const personCardRef = React.useRef(null);
+  const personIconRef = React.useRef(null);
+  const cartCardRef = React.useRef(null);
+  const cartIconRef = React.useRef(null);
   const open = Boolean(anchorEl);
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,6 +59,54 @@ function NavigationBar({ cartItemCount }) {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Handle mouse leave for person card
+  React.useEffect(() => {
+    const handlePersonMouseLeave = (event) => {
+      if (
+        personCardRef.current &&
+        !personCardRef.current.contains(event.relatedTarget) &&
+        personIconRef.current &&
+        !personIconRef.current.contains(event.relatedTarget)
+      ) {
+        setIsPersonHovered(false);
+      }
+    };
+
+    if (personCardRef.current) {
+      personCardRef.current.addEventListener('mouseleave', handlePersonMouseLeave);
+    }
+
+    return () => {
+      if (personCardRef.current) {
+        personCardRef.current.removeEventListener('mouseleave', handlePersonMouseLeave);
+      }
+    };
+  }, [isPersonHovered]);
+
+  // Handle mouse leave for cart card
+  React.useEffect(() => {
+    const handleCartMouseLeave = (event) => {
+      if (
+        cartCardRef.current &&
+        !cartCardRef.current.contains(event.relatedTarget) &&
+        cartIconRef.current &&
+        !cartIconRef.current.contains(event.relatedTarget)
+      ) {
+        setIsCartHovered(false);
+      }
+    };
+
+    if (cartCardRef.current) {
+      cartCardRef.current.addEventListener('mouseleave', handleCartMouseLeave);
+    }
+
+    return () => {
+      if (cartCardRef.current) {
+        cartCardRef.current.removeEventListener('mouseleave', handleCartMouseLeave);
+      }
+    };
+  }, [isCartHovered]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -134,11 +188,26 @@ function NavigationBar({ cartItemCount }) {
   };
 
   const handlePersonHover = () => {
-    setIsHovered(true);
+    setIsPersonHovered(true);
   };
 
-  const handlePersonLeave = () => {
-    setIsHovered(false);
+  const handleCartHover = () => {
+    setIsCartHovered(true);
+  };
+
+  const handleSignInClick = () => {
+    setIsPersonHovered(false);
+    navigate('/login');
+  };
+
+  const handleViewCart = () => {
+    setIsCartHovered(false);
+    navigate('/cart');
+  };
+
+  const handleCheckout = () => {
+    setIsCartHovered(false);
+    navigate('/checkout');
   };
 
   return (
@@ -147,15 +216,15 @@ function NavigationBar({ cartItemCount }) {
         position="sticky"
         sx={{
           backgroundColor: 'white',
-          marginBottom: '2rem',
-          height: 'auto', // Adjusted to fit the new "Become a Supplier" section
+          height: 'auto',
           justifyContent: 'center',
+          boxShadow: 'none',
           '& .logo-link': {
             textDecoration: 'none',
-            color: '#FF6A00', // Alibaba orange color
+            color: '#FF6A00',
             fontWeight: 'bold',
             fontSize: '1.5rem',
-            fontFamily: '"Raleway", sans-serif', // Unique font for "Loremxyz"
+            fontFamily: '"Raleway", sans-serif',
           },
           '& .search-bar': {
             backgroundColor: 'rgba(0,0,0,0.05)',
@@ -237,9 +306,20 @@ function NavigationBar({ cartItemCount }) {
                 )}
               </form>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto', gap: '10px', flexDirection: 'column', marginTop: '0.25rem' }}>
-                {/* Top Row: Cart, Language, Sign In/Out, Sign Up */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 'auto',
+                flexDirection: 'column',
+                marginTop: '0.25rem',
+                gap: '4px' // Reduced gap between top and bottom row
+              }}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '24px', // Increased gap between items
+                  padding: '0 16px' // Added padding to space out items
+                }}>
                   {/* Language Icon */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }} onClick={handleLanguageClick}>
                     <LanguageIcon sx={{ color: 'black' }} />
@@ -266,22 +346,32 @@ function NavigationBar({ cartItemCount }) {
                   </Popover>
 
                   {/* Cart Icon */}
-                  <IconButton color="inherit" component={Link} to="/cart">
-                    <Badge badgeContent={cartItemCount} color="secondary">
-                      <ShoppingCartIcon sx={{ color: 'black' }} />
-                    </Badge>
-                  </IconButton>
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center' }}
+                    onMouseEnter={handleCartHover}
+                    ref={cartIconRef}
+                  >
+                    <IconButton color="inherit">
+                      <Badge badgeContent={cartItemCount} color="secondary">
+                        <ShoppingCartIcon sx={{ color: 'black' }} />
+                      </Badge>
+                    </IconButton>
+                  </Box>
 
-                  {/* Person Icon (Sign In) */}
+                  {/* Person Icon */}
                   {isLoggedIn ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }} onClick={handleLogout}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+                      onClick={handleLogout}
+                      ref={personIconRef}
+                    >
                       <PersonIcon sx={{ color: 'black' }} />
                     </Box>
                   ) : (
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
                       onMouseEnter={handlePersonHover}
-                      onMouseLeave={handlePersonLeave}
+                      ref={personIconRef}
                     >
                       <PersonIcon sx={{ color: 'black' }} />
                     </Box>
@@ -292,14 +382,14 @@ function NavigationBar({ cartItemCount }) {
                     component={Link}
                     to="/register"
                     sx={{
-                      backgroundColor: '#FF6A00', // Alibaba orange color
+                      backgroundColor: '#FF6A00',
                       borderRadius: '25px',
                       color: 'white',
                       fontSize: '0.875rem',
                       padding: '0.5rem 1.5rem',
                       textTransform: 'none',
                       '&:hover': {
-                        backgroundColor: '#E65A00', // Darker orange on hover
+                        backgroundColor: '#E65A00',
                       },
                     }}
                   >
@@ -307,13 +397,14 @@ function NavigationBar({ cartItemCount }) {
                   </Button>
                 </Box>
 
-                {/* Bottom Row: Become a Supplier */}
+                {/* Become a Supplier Link - Will be covered by hover cards */}
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
                     width: '100%',
-                    marginTop: '0.1rem', // Reduced margin to bring it up
+                    marginTop: '0.1rem',
+                    visibility: (isPersonHovered || isCartHovered) ? 'hidden' : 'visible',
                   }}
                 >
                   <Link
@@ -323,7 +414,7 @@ function NavigationBar({ cartItemCount }) {
                       textDecoration: 'none',
                       fontSize: '0.875rem',
                       fontWeight: 'bold',
-                      fontFamily: '"Poppins", sans-serif', // Use Poppins for "Become a Supplier"
+                      fontFamily: '"Poppins", sans-serif',
                       '&:hover': {
                         textDecoration: 'underline',
                       },
@@ -337,6 +428,7 @@ function NavigationBar({ cartItemCount }) {
           )}
         </Toolbar>
 
+        {/* Search Results */}
         {searchResults.length > 0 && searchBarRef.current && (
           <Box
             ref={searchResultsRef}
@@ -356,13 +448,14 @@ function NavigationBar({ cartItemCount }) {
           </Box>
         )}
 
-        {/* Person Icon Hover Card */}
-        {isHovered && (
+        {/* Person Hover Card */}
+        {isPersonHovered && !isLoggedIn && (
           <Box
+            ref={personCardRef}
             sx={{
               position: 'absolute',
-              top: '75px', // Adjust this value based on your navbar height
-              right: '20px', // Adjust this value based on your layout
+              top: '60px', // Raised up to cover "Become a Supplier"
+              right: '20px',
               zIndex: 10,
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -371,8 +464,6 @@ function NavigationBar({ cartItemCount }) {
               p: 2,
               textAlign: 'center',
             }}
-            onMouseEnter={handlePersonHover}
-            onMouseLeave={handlePersonLeave}
           >
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
               Welcome to Loremxyz
@@ -387,6 +478,7 @@ function NavigationBar({ cartItemCount }) {
                   backgroundColor: '#E65A00',
                 },
               }}
+              onClick={handleSignInClick}
             >
               Sign in
             </Button>
@@ -394,13 +486,99 @@ function NavigationBar({ cartItemCount }) {
               or continue with
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-              <IconButton sx={{ color: '#DB4437' }}>
+              <IconButton
+                sx={{ color: '#DB4437' }}
+                component={Link}
+                to="/google-auth"
+                onClick={() => setIsPersonHovered(false)}
+              >
                 <GoogleIcon />
               </IconButton>
-              <IconButton sx={{ color: '#4267B2' }}>
+              <IconButton
+                sx={{ color: '#4267B2' }}
+                component={Link}
+                to="/facebook-auth"
+                onClick={() => setIsPersonHovered(false)}
+              >
                 <FacebookIcon />
               </IconButton>
             </Box>
+          </Box>
+        )}
+
+        {/* Cart Hover Card */}
+        {isCartHovered && (
+          <Box
+            ref={cartCardRef}
+            sx={{
+              position: 'absolute',
+              top: '60px', // Raised up to cover "Become a Supplier"
+              right: '100px',
+              zIndex: 10,
+              backgroundColor: 'white',
+              borderRadius: '4px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              width: '300px',
+              p: 2,
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}>
+              Your Cart ({cartItemCount})
+            </Typography>
+
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '100px',
+              mb: 2
+            }}>
+              {cartItemCount > 0 ? (
+                <Typography>Your cart items would appear here</Typography>
+              ) : (
+                <Typography>Your cart is empty</Typography>
+              )}
+            </Box>
+
+            <Divider sx={{ my: 1 }} />
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography>Subtotal:</Typography>
+              <Typography fontWeight="bold">${(cartItemCount * 19.99).toFixed(2)}</Typography>
+            </Box>
+
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                mb: 1,
+                backgroundColor: '#FF6A00',
+                '&:hover': {
+                  backgroundColor: '#E65A00',
+                },
+              }}
+              onClick={handleViewCart}
+            >
+              View Cart
+            </Button>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{
+                borderColor: '#FF6A00',
+                color: '#FF6A00',
+                '&:hover': {
+                  borderColor: '#E65A00',
+                  color: '#E65A00',
+                },
+              }}
+              onClick={handleCheckout}
+              disabled={cartItemCount === 0}
+            >
+              Checkout
+            </Button>
           </Box>
         )}
       </AppBar>
