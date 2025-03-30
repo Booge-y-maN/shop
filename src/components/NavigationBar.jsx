@@ -20,6 +20,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LanguageIcon from '@mui/icons-material/Language';
 import PersonIcon from '@mui/icons-material/Person';
+import CategoryIcon from '@mui/icons-material/Category'; // Added for All categories
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchResults from './SearchResults';
@@ -222,9 +223,18 @@ function NavigationBar({ cartItemCount }) {
           '& .logo-link': {
             textDecoration: 'none',
             color: '#FF6A00',
-            fontWeight: 'bold',
-            fontSize: '1.5rem',
-            fontFamily: '"Raleway", sans-serif',
+            fontWeight: '800',
+            fontSize: '2rem',
+            fontFamily: '"Montserrat", sans-serif',
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            background: 'linear-gradient(to right, #FF6A00, #FF9E00)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            textShadow: '1px 1px 3px rgba(0,0,0,0.1)',
+            '&:hover': {
+              textShadow: '1px 1px 5px rgba(0,0,0,0.2)',
+            }
           },
           '& .search-bar': {
             backgroundColor: 'rgba(0,0,0,0.05)',
@@ -253,12 +263,19 @@ function NavigationBar({ cartItemCount }) {
           },
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '8px' }}>
           {isMobile ? (
             <>
-              <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={handleClick}>
-                <MenuIcon />
-              </IconButton>
+              <Box sx={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+                <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={handleClick}>
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Link to="/" className="logo-link">
+                    Loremxyz
+                  </Link>
+                </Typography>
+              </Box>
               <Menu id="mobile-menu" anchorEl={anchorEl} open={open} onClose={handleClose}>
                 <MenuItem onClick={handleClose} component={Link} to="/">
                   Home
@@ -270,82 +287,58 @@ function NavigationBar({ cartItemCount }) {
                   Cart
                 </MenuItem>
               </Menu>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link to="/" className="logo-link">
-                  Loremxyz
-                </Link>
-              </Typography>
             </>
           ) : (
             <>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <Link to="/" className="logo-link">
-                  Loremxyz
-                </Link>
-              </Typography>
-
-              <form className="search-bar" ref={searchBarRef} onSubmit={e => e.preventDefault()}>
-                <IconButton onClick={handleSearchIconClick} sx={{ color: 'black' }}>
-                  <SearchIcon />
-                </IconButton>
-                <InputBase
-                  placeholder="Search for a product..."
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  style={{ width: '100%' }}
-                />
-                {loading && (
-                  <CircularProgress
-                    size={20}
-                    sx={{
-                      color: 'black',
-                      marginLeft: '10px',
-                    }}
-                  />
-                )}
-              </form>
-
               <Box sx={{
                 display: 'flex',
+                width: '100%',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginLeft: 'auto',
-                flexDirection: 'column',
-                marginTop: '0.25rem',
-                gap: '4px' // Reduced gap between top and bottom row
+                marginBottom: '1px'
               }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="h6" component="div">
+                    <Link to="/" className="logo-link">
+                      Loremxyz
+                    </Link>
+                  </Typography>
+                </Box>
+
+                <form className="search-bar" ref={searchBarRef} onSubmit={e => e.preventDefault()}>
+                  <IconButton onClick={handleSearchIconClick} sx={{ color: 'black' }}>
+                    <SearchIcon />
+                  </IconButton>
+                  <InputBase
+                    placeholder="Search for a product..."
+                    inputProps={{ 'aria-label': 'search' }}
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    style={{ width: '100%' }}
+                  />
+                  {loading && (
+                    <CircularProgress
+                      size={20}
+                      sx={{
+                        color: 'black',
+                        marginLeft: '10px',
+                      }}
+                    />
+                  )}
+                </form>
+
                 <Box sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '24px', // Increased gap between items
-                  padding: '0 16px' // Added padding to space out items
+                  gap: '24px',
                 }}>
-                  {/* Language Icon */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }} onClick={handleLanguageClick}>
                     <LanguageIcon sx={{ color: 'black' }} />
                     <Typography variant="body1" sx={{ color: 'black', fontSize: '0.875rem' }}>
                       {selectedLanguage}
                     </Typography>
                   </Box>
-                  <Popover
-                    open={Boolean(languageAnchorEl)}
-                    anchorEl={languageAnchorEl}
-                    onClose={handleLanguageClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                  >
-                    <MenuItem onClick={() => handleLanguageSelect('En-US')}>English</MenuItem>
-                    <MenuItem onClick={() => handleLanguageSelect('Fr-FR')}>French</MenuItem>
-                    <MenuItem onClick={() => handleLanguageSelect('Es-ES')}>Spanish</MenuItem>
-                  </Popover>
 
-                  {/* Cart Icon */}
                   <Box
                     sx={{ display: 'flex', alignItems: 'center' }}
                     onMouseEnter={handleCartHover}
@@ -358,7 +351,6 @@ function NavigationBar({ cartItemCount }) {
                     </IconButton>
                   </Box>
 
-                  {/* Person Icon */}
                   {isLoggedIn ? (
                     <Box
                       sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
@@ -377,7 +369,6 @@ function NavigationBar({ cartItemCount }) {
                     </Box>
                   )}
 
-                  {/* Sign Up Button */}
                   <Button
                     component={Link}
                     to="/register"
@@ -396,14 +387,55 @@ function NavigationBar({ cartItemCount }) {
                     Sign up
                   </Button>
                 </Box>
+              </Box>
 
-                {/* Become a Supplier Link - Will be covered by hover cards */}
+              <Box sx={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 0',
+                marginBottom: '1px'
+              }}>
+                <Box sx={{ display: 'flex', gap: '24px' }}>
+                  <Link
+                    to="/categories"
+                    style={{
+                      color: 'black',
+                      textDecoration: 'none',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      fontFamily: '"Poppins", sans-serif',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    <CategoryIcon fontSize="small" />
+                    All categories
+                  </Link>
+                  <Link
+                    to="/shop"
+                    style={{
+                      color: 'black',
+                      textDecoration: 'none',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      fontFamily: '"Poppins", sans-serif',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    All products
+                  </Link>
+                </Box>
+
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    width: '100%',
-                    marginTop: '0.1rem',
                     visibility: (isPersonHovered || isCartHovered) ? 'hidden' : 'visible',
                   }}
                 >
@@ -428,7 +460,6 @@ function NavigationBar({ cartItemCount }) {
           )}
         </Toolbar>
 
-        {/* Search Results */}
         {searchResults.length > 0 && searchBarRef.current && (
           <Box
             ref={searchResultsRef}
@@ -448,13 +479,12 @@ function NavigationBar({ cartItemCount }) {
           </Box>
         )}
 
-        {/* Person Hover Card */}
         {isPersonHovered && !isLoggedIn && (
           <Box
             ref={personCardRef}
             sx={{
               position: 'absolute',
-              top: '60px', // Raised up to cover "Become a Supplier"
+              top: '100px',
               right: '20px',
               zIndex: 10,
               backgroundColor: 'white',
@@ -506,13 +536,12 @@ function NavigationBar({ cartItemCount }) {
           </Box>
         )}
 
-        {/* Cart Hover Card */}
         {isCartHovered && (
           <Box
             ref={cartCardRef}
             sx={{
               position: 'absolute',
-              top: '60px', // Raised up to cover "Become a Supplier"
+              top: '100px',
               right: '100px',
               zIndex: 10,
               backgroundColor: 'white',
