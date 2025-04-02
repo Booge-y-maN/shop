@@ -14,13 +14,17 @@ import {
   CircularProgress,
   Popover,
   Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LanguageIcon from '@mui/icons-material/Language';
 import PersonIcon from '@mui/icons-material/Person';
-import CategoryIcon from '@mui/icons-material/Category'; // Added for All categories
+import CategoryIcon from '@mui/icons-material/Category';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SearchResults from './SearchResults';
@@ -39,16 +43,29 @@ function NavigationBar({ cartItemCount }) {
   const [selectedLanguage, setSelectedLanguage] = React.useState('En-US');
   const [isPersonHovered, setIsPersonHovered] = React.useState(false);
   const [isCartHovered, setIsCartHovered] = React.useState(false);
+  const [isCategoriesHovered, setIsCategoriesHovered] = React.useState(false);
   const searchBarRef = React.useRef(null);
   const searchResultsRef = React.useRef(null);
   const personCardRef = React.useRef(null);
   const personIconRef = React.useRef(null);
   const cartCardRef = React.useRef(null);
   const cartIconRef = React.useRef(null);
+  const categoriesRef = React.useRef(null);
+  const categoriesButtonRef = React.useRef(null);
   const open = Boolean(anchorEl);
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width:900px)');
+
+  // Sample categories data
+  const categories = [
+    { name: 'Electronics', path: '/category/electronics' },
+    { name: 'Clothing', path: '/category/clothing' },
+    { name: 'Home & Garden', path: '/category/home-garden' },
+    { name: 'Books', path: '/category/books' },
+    { name: 'Toys', path: '/category/toys' },
+    { name: 'Sports', path: '/category/sports' },
+  ];
 
   React.useEffect(() => {
     const checkToken = () => {
@@ -108,6 +125,30 @@ function NavigationBar({ cartItemCount }) {
       }
     };
   }, [isCartHovered]);
+
+  // Handle mouse leave for categories dropdown
+  React.useEffect(() => {
+    const handleCategoriesMouseLeave = (event) => {
+      if (
+        categoriesRef.current &&
+        !categoriesRef.current.contains(event.relatedTarget) &&
+        categoriesButtonRef.current &&
+        !categoriesButtonRef.current.contains(event.relatedTarget)
+      ) {
+        setIsCategoriesHovered(false);
+      }
+    };
+
+    if (categoriesRef.current) {
+      categoriesRef.current.addEventListener('mouseleave', handleCategoriesMouseLeave);
+    }
+
+    return () => {
+      if (categoriesRef.current) {
+        categoriesRef.current.removeEventListener('mouseleave', handleCategoriesMouseLeave);
+      }
+    };
+  }, [isCategoriesHovered]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -190,10 +231,16 @@ function NavigationBar({ cartItemCount }) {
 
   const handlePersonHover = () => {
     setIsPersonHovered(true);
+    setIsCartHovered(false); // Ensure cart is closed when person hover starts
   };
 
   const handleCartHover = () => {
     setIsCartHovered(true);
+    setIsPersonHovered(false); // Ensure person card is closed when cart hover starts
+  };
+
+  const handleCategoriesHover = () => {
+    setIsCategoriesHovered(true);
   };
 
   const handleSignInClick = () => {
@@ -209,6 +256,10 @@ function NavigationBar({ cartItemCount }) {
   const handleCheckout = () => {
     setIsCartHovered(false);
     navigate('/checkout');
+  };
+
+  const handleCategoryClick = () => {
+    setIsCategoriesHovered(false);
   };
 
   return (
@@ -395,12 +446,14 @@ function NavigationBar({ cartItemCount }) {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '8px 0',
-                marginBottom: '1px'
+                marginBottom: '1px',
+                position: 'relative'
               }}>
                 <Box sx={{ display: 'flex', gap: '24px' }}>
-                  <Link
-                    to="/categories"
-                    style={{
+                  <Box
+                    ref={categoriesButtonRef}
+                    onMouseEnter={handleCategoriesHover}
+                    sx={{
                       color: 'black',
                       textDecoration: 'none',
                       fontSize: '0.875rem',
@@ -409,6 +462,7 @@ function NavigationBar({ cartItemCount }) {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
+                      cursor: 'pointer',
                       '&:hover': {
                         textDecoration: 'underline',
                       },
@@ -416,7 +470,7 @@ function NavigationBar({ cartItemCount }) {
                   >
                     <CategoryIcon fontSize="small" />
                     All categories
-                  </Link>
+                  </Box>
                   <Link
                     to="/shop"
                     style={{
@@ -436,7 +490,7 @@ function NavigationBar({ cartItemCount }) {
 
                 <Box
                   sx={{
-                    visibility: (isPersonHovered || isCartHovered) ? 'hidden' : 'visible',
+                    visibility: (isPersonHovered || isCartHovered || isCategoriesHovered) ? 'hidden' : 'visible',
                   }}
                 >
                   <Link
@@ -455,6 +509,37 @@ function NavigationBar({ cartItemCount }) {
                     Become a Supplier
                   </Link>
                 </Box>
+
+                {isCategoriesHovered && (
+                  <Paper
+                    ref={categoriesRef}
+                    sx={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      zIndex: 10,
+                      width: '250px',
+                      maxHeight: '400px',
+                      overflow: 'auto',
+                      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                    }}
+                    onMouseLeave={() => setIsCategoriesHovered(false)}
+                  >
+                    <List>
+                      {categories.map((category) => (
+                        <ListItem
+                          button
+                          key={category.name}
+                          component={Link}
+                          to={category.path}
+                          onClick={handleCategoryClick}
+                        >
+                          <ListItemText primary={category.name} />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Paper>
+                )}
               </Box>
             </>
           )}
