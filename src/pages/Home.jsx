@@ -35,9 +35,9 @@ function Home({ products, addToCart, error, loading }) {
 
   // Get 9 random products
   const featuredProducts = React.useMemo(() => {
-    if (products.length > 9) {
+    if (products.length > 15) {
       const shuffledProducts = shuffleArray([...products]); // Shuffle the products array
-      return shuffledProducts.slice(0, 9); // Take the first 9 products
+      return shuffledProducts.slice(0, 15); // Take the first 9 products
     }
     return products; // If there are 9 or fewer products, return all of them
   }, [products]);

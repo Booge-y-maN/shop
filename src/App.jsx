@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import NotFoundPage from './pages/NotFoundPage';
+import BecomeSupplier from './pages/BecomeSupplier'
 import Footer from './components/Footer';
 
 const theme = createTheme({
@@ -83,6 +84,8 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             <Route path="/reset-password" element={<ResetPassword />} />
+
+            <Route path="/become-a-supplier" element={<BecomeSupplier />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
