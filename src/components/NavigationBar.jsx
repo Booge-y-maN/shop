@@ -38,7 +38,8 @@ function NavigationBar({ cartItemCount }) {
     <AppBar position="sticky" sx={{
       backgroundColor: 'background.paper',
       color: 'text.primary',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+      boxShadow: 'none', // Remove shadow
+      borderBottom: 'none' // Remove any bottom border
     }}>
       <Toolbar sx={{ flexDirection: 'column', px: 0, py: 0.5 }}>
         {/* Top Bar */}
