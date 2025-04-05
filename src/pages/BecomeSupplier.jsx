@@ -106,7 +106,7 @@ export default function SupplierSignUp() {
 
         {/* Social Sign Up */}
         <Typography variant="body2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
-          OR Continue with
+          Continue with
         </Typography>
 
         <Grid container spacing={1} sx={{ mb: 2 }}>
