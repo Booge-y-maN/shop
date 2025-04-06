@@ -20,7 +20,7 @@ function NavigationBar({ cartItemCount }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
-  const isSmallMobile = useMediaQuery('(max-width:600px)');
+  const isSmallMobile = useMediaQuery('(max-width:480px)');
   const navigate = useNavigate();
 
   const categories = [
@@ -49,13 +49,13 @@ function NavigationBar({ cartItemCount }) {
       backgroundColor: 'background.paper',
       color: 'text.primary',
       boxShadow: 'none',
-      borderBottom: 'none',
+      borderBottom: '1px solid',
       borderColor: 'divider'
     }}>
       <Container maxWidth="xl" disableGutters>
         <Toolbar sx={{
           flexDirection: 'column',
-          px: { xs: 0, sm: 0 },
+          px: 0,
           py: 0.5
         }}>
           {/* Top Bar */}
@@ -65,38 +65,42 @@ function NavigationBar({ cartItemCount }) {
             alignItems: 'center',
             width: '100%',
             mb: 0.5,
-            px: { xs: 2, sm: 3, md: 0 }
+            px: { xs: 1.5, sm: 2, md: 0 }
           }}>
-            {isMobile && (
-              <IconButton
-                edge="start"
-                color="inherit"
-                onClick={() => setMobileMenuOpen(true)}
-                sx={{ mr: 1 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
-
             <Box sx={{
-              flex: 1,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: isMobile ? 'center' : 'flex-start'
+              minWidth: isMobile ? 'auto' : 'auto',
+              flexShrink: 0
             }}>
+              {isMobile && (
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={() => setMobileMenuOpen(true)}
+                  sx={{
+                    mr: isSmallMobile ? 0.5 : 1,
+                    p: isSmallMobile ? 0.5 : 1
+                  }}
+                >
+                  <MenuIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                </IconButton>
+              )}
               <Typography
                 variant="h6"
                 component={Link}
                 to="/"
                 sx={{
                   fontWeight: 800,
-                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  fontSize: isSmallMobile ? '1.1rem' : { xs: '1.25rem', md: '1.75rem' },
                   fontFamily: 'Montserrat, sans-serif',
                   background: 'linear-gradient(45deg, #FF6A00 30%, #FF9E00 90%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   textDecoration: 'none',
-                  '&:hover': { opacity: 0.9 }
+                  '&:hover': { opacity: 0.9 },
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.2
                 }}>
                 Loremxyz
               </Typography>
@@ -134,29 +138,31 @@ function NavigationBar({ cartItemCount }) {
             )}
 
             <Box sx={{
-              flex: 1,
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
-              gap: { xs: 0.5, sm: 1.5 }
+              gap: isSmallMobile ? 0.5 : 1,
+              flexShrink: 0
             }}>
               {isMobile && (
                 <IconButton
                   onClick={toggleMobileSearch}
                   sx={{
                     color: 'text.primary',
-                    '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' }
+                    '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
+                    p: isSmallMobile ? 0.5 : 1
                   }}>
-                  <SearchIcon fontSize="medium" />
+                  <SearchIcon fontSize={isSmallMobile ? "small" : "medium"} />
                 </IconButton>
               )}
 
               <IconButton sx={{
                 color: 'text.primary',
                 '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
+                p: isSmallMobile ? 0.5 : 1,
                 display: { xs: 'none', sm: 'flex' }
               }}>
-                <LanguageIcon fontSize="medium" />
+                <LanguageIcon fontSize={isSmallMobile ? "small" : "medium"} />
               </IconButton>
 
               {/* Cart */}
@@ -168,10 +174,21 @@ function NavigationBar({ cartItemCount }) {
               >
                 <IconButton sx={{
                   color: 'text.primary',
-                  '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' }
+                  '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
+                  p: isSmallMobile ? 0.5 : 1
                 }}>
-                  <Badge badgeContent={cartItemCount} color="primary">
-                    <ShoppingCartIcon fontSize="medium" />
+                  <Badge
+                    badgeContent={cartItemCount}
+                    color="primary"
+                    sx={{
+                      '& .MuiBadge-badge': {
+                        fontSize: isSmallMobile ? '0.5rem' : '0.6rem',
+                        height: isSmallMobile ? 14 : 16,
+                        minWidth: isSmallMobile ? 14 : 16,
+                      }
+                    }}
+                  >
+                    <ShoppingCartIcon fontSize={isSmallMobile ? "small" : "medium"} />
                   </Badge>
                 </IconButton>
               </Box>
@@ -186,9 +203,9 @@ function NavigationBar({ cartItemCount }) {
                 <IconButton sx={{
                   color: 'text.primary',
                   '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                  display: { xs: 'none', sm: 'flex' }
+                  p: isSmallMobile ? 0.5 : 1
                 }}>
-                  <PersonIcon fontSize="medium" />
+                  <PersonIcon fontSize={isSmallMobile ? "small" : "medium"} />
                 </IconButton>
               </Box>
 
@@ -198,20 +215,20 @@ function NavigationBar({ cartItemCount }) {
                 variant="contained"
                 sx={{
                   borderRadius: '20px',
-                  px: { xs: 1, sm: 2 },
-                  py: 0.5,
+                  px: isSmallMobile ? 1 : 1.5,
+                  py: isSmallMobile ? 0.25 : 0.5,
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: '0.9rem',
+                  fontSize: isSmallMobile ? '0.65rem' : '0.75rem',
                   minWidth: 'unset',
+                  whiteSpace: 'nowrap',
                   background: 'linear-gradient(45deg, #FF6A00 30%, #FF9E00 90%)',
                   color: 'white',
                   '&:hover': {
                     background: 'linear-gradient(45deg, #E65A00 30%, #E68E00 90%)'
-                  },
-                  display: { xs: 'none', sm: 'flex' }
+                  }
                 }}>
-                {isSmallMobile ? 'Sign Up' : 'Sign Up'}
+                Sign Up
               </Button>
             </Box>
           </Box>
@@ -254,15 +271,15 @@ function NavigationBar({ cartItemCount }) {
           )}
 
           {/* Categories & Products Bar */}
-          {!isMobile && (
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-              position: 'relative',
-              px: { xs: 2, md: 0 }
-            }}>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            position: 'relative',
+            px: { xs: 1.5, md: 0 }
+          }}>
+            {!isMobile && (
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <ClickAwayListener onClickAway={() => handleHover('categories', false)}>
                   <Box>
@@ -343,25 +360,27 @@ function NavigationBar({ cartItemCount }) {
                   All Products
                 </Button>
               </Box>
+            )}
 
-              <Button
-                component={Link}
-                to="/become-a-supplier"
-                sx={{
-                  color: '#FF6A00',
-                  textTransform: 'none',
-                  fontWeight: 800,
-                  fontSize: '0.9rem',
-                  fontFamily: 'Montserrat, sans-serif',
-                  letterSpacing: '0.5px',
-                  '&:hover': {
-                    backgroundColor: 'transparent'
-                  }
-                }}>
-                Become a Supplier
-              </Button>
-            </Box>
-          )}
+            <Button
+              component={Link}
+              to="/become-a-supplier"
+              sx={{
+                color: '#FF6A00',
+                textTransform: 'none',
+                fontWeight: 800,
+                fontSize: isSmallMobile ? '0.65rem' : '0.75rem',
+                fontFamily: 'Montserrat, sans-serif',
+                letterSpacing: '0.5px',
+                whiteSpace: 'nowrap',
+                px: isSmallMobile ? 0.5 : 1,
+                '&:hover': {
+                  backgroundColor: 'transparent'
+                }
+              }}>
+              Become a Supplier
+            </Button>
+          </Box>
         </Toolbar>
 
         {/* Mobile Menu Drawer */}
