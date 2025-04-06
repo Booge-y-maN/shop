@@ -21,6 +21,7 @@ function NavigationBar({ cartItemCount }) {
   const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
   const isSmallMobile = useMediaQuery('(max-width:480px)');
+  const isLargeScreen = useMediaQuery('(min-width:1200px)');
   const navigate = useNavigate();
 
   const categories = [
@@ -50,6 +51,7 @@ function NavigationBar({ cartItemCount }) {
       color: 'text.primary',
       boxShadow: 'none',
       borderBottom: 'none',
+      borderColor: 'divider'
     }}>
       <Container maxWidth="xl" disableGutters>
         <Toolbar sx={{
@@ -64,7 +66,7 @@ function NavigationBar({ cartItemCount }) {
             alignItems: 'center',
             width: '100%',
             mb: 0.5,
-            px: { xs: 1.5, sm: 2, md: 0 }
+            px: { xs: 2, sm: 3, md: 0 }
           }}>
             <Box sx={{
               display: 'flex',
@@ -78,11 +80,11 @@ function NavigationBar({ cartItemCount }) {
                   color="inherit"
                   onClick={() => setMobileMenuOpen(true)}
                   sx={{
-                    mr: isSmallMobile ? 0.5 : 1,
-                    p: isSmallMobile ? 0.5 : 1
+                    mr: isSmallMobile ? 1 : 1.5,
+                    p: isSmallMobile ? 0.75 : 1
                   }}
                 >
-                  <MenuIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                  <MenuIcon fontSize={isSmallMobile ? "medium" : "large"} />
                 </IconButton>
               )}
               <Typography
@@ -91,7 +93,7 @@ function NavigationBar({ cartItemCount }) {
                 to="/"
                 sx={{
                   fontWeight: 800,
-                  fontSize: isSmallMobile ? '1.1rem' : { xs: '1.25rem', md: '1.75rem' },
+                  fontSize: isSmallMobile ? '1.4rem' : isMobile ? '1.5rem' : isLargeScreen ? '2rem' : '1.75rem',
                   fontFamily: 'Montserrat, sans-serif',
                   background: 'linear-gradient(45deg, #FF6A00 30%, #FF9E00 90%)',
                   WebkitBackgroundClip: 'text',
@@ -140,7 +142,7 @@ function NavigationBar({ cartItemCount }) {
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
-              gap: isSmallMobile ? 0.5 : 1,
+              gap: isSmallMobile ? 1 : 1.5,
               flexShrink: 0
             }}>
               {isMobile && (
@@ -149,19 +151,19 @@ function NavigationBar({ cartItemCount }) {
                   sx={{
                     color: 'text.primary',
                     '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                    p: isSmallMobile ? 0.5 : 1
+                    p: isSmallMobile ? 0.75 : 1
                   }}>
-                  <SearchIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                  <SearchIcon fontSize={isSmallMobile ? "medium" : "large"} />
                 </IconButton>
               )}
 
               <IconButton sx={{
                 color: 'text.primary',
                 '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                p: isSmallMobile ? 0.5 : 1,
+                p: isSmallMobile ? 0.75 : 1,
                 display: { xs: 'none', sm: 'flex' }
               }}>
-                <LanguageIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                <LanguageIcon fontSize={isSmallMobile ? "medium" : "large"} />
               </IconButton>
 
               {/* Cart */}
@@ -174,20 +176,20 @@ function NavigationBar({ cartItemCount }) {
                 <IconButton sx={{
                   color: 'text.primary',
                   '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                  p: isSmallMobile ? 0.5 : 1
+                  p: isSmallMobile ? 0.75 : 1
                 }}>
                   <Badge
                     badgeContent={cartItemCount}
                     color="primary"
                     sx={{
                       '& .MuiBadge-badge': {
-                        fontSize: isSmallMobile ? '0.5rem' : '0.6rem',
-                        height: isSmallMobile ? 14 : 16,
-                        minWidth: isSmallMobile ? 14 : 16,
+                        fontSize: isSmallMobile ? '0.7rem' : '0.8rem',
+                        height: isSmallMobile ? 18 : 20,
+                        minWidth: isSmallMobile ? 18 : 20,
                       }
                     }}
                   >
-                    <ShoppingCartIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                    <ShoppingCartIcon fontSize={isSmallMobile ? "medium" : "large"} />
                   </Badge>
                 </IconButton>
               </Box>
@@ -202,9 +204,9 @@ function NavigationBar({ cartItemCount }) {
                 <IconButton sx={{
                   color: 'text.primary',
                   '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                  p: isSmallMobile ? 0.5 : 1
+                  p: isSmallMobile ? 0.75 : 1
                 }}>
-                  <PersonIcon fontSize={isSmallMobile ? "small" : "medium"} />
+                  <PersonIcon fontSize={isSmallMobile ? "medium" : "large"} />
                 </IconButton>
               </Box>
 
@@ -214,11 +216,11 @@ function NavigationBar({ cartItemCount }) {
                 variant="contained"
                 sx={{
                   borderRadius: '20px',
-                  px: isSmallMobile ? 1 : 1.5,
-                  py: isSmallMobile ? 0.25 : 0.5,
+                  px: isSmallMobile ? 1.5 : 2,
+                  py: isSmallMobile ? 0.5 : 0.75,
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: isSmallMobile ? '0.65rem' : '0.75rem',
+                  fontSize: isSmallMobile ? '0.8rem' : isLargeScreen ? '0.95rem' : '0.85rem',
                   minWidth: 'unset',
                   whiteSpace: 'nowrap',
                   background: 'linear-gradient(45deg, #FF6A00 30%, #FF9E00 90%)',
@@ -272,11 +274,11 @@ function NavigationBar({ cartItemCount }) {
           {/* Categories & Products Bar */}
           <Box sx={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: isMobile ? 'flex-end' : 'space-between',
             alignItems: 'center',
             width: '100%',
             position: 'relative',
-            px: { xs: 1.5, md: 0 }
+            px: { xs: 2, md: 0 }
           }}>
             {!isMobile && (
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
@@ -368,11 +370,11 @@ function NavigationBar({ cartItemCount }) {
                 color: '#FF6A00',
                 textTransform: 'none',
                 fontWeight: 800,
-                fontSize: isSmallMobile ? '0.65rem' : '0.75rem',
+                fontSize: isSmallMobile ? '0.8rem' : isLargeScreen ? '1rem' : '0.9rem',
                 fontFamily: 'Montserrat, sans-serif',
                 letterSpacing: '0.5px',
                 whiteSpace: 'nowrap',
-                px: isSmallMobile ? 0.5 : 1,
+                px: isSmallMobile ? 1 : 1.5,
                 '&:hover': {
                   backgroundColor: 'transparent'
                 }
