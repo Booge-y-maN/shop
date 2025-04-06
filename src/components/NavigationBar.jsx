@@ -49,8 +49,7 @@ function NavigationBar({ cartItemCount }) {
       backgroundColor: 'background.paper',
       color: 'text.primary',
       boxShadow: 'none',
-      borderBottom: '1px solid',
-      borderColor: 'divider'
+      borderBottom: 'none',
     }}>
       <Container maxWidth="xl" disableGutters>
         <Toolbar sx={{
