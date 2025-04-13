@@ -2,12 +2,12 @@ import * as React from 'react';
 import {
   AppBar, Toolbar, Typography, Button, IconButton, Badge, InputBase, useMediaQuery,
   Box, Divider, List, ListItem, ListItemText, Paper, Fade, ClickAwayListener,
-  Avatar, Stack, Drawer, Container
+  Avatar, Stack, Drawer, Container, Tooltip
 } from '@mui/material';
 import {
   Menu as MenuIcon, Search as SearchIcon, ShoppingCart as ShoppingCartIcon,
-  Language as LanguageIcon, Person as PersonIcon, Category as CategoryIcon,
-  KeyboardArrowDown as ArrowDownIcon, Facebook, Google, LinkedIn, Close as CloseIcon
+  Language as LanguageIcon, Person as PersonIcon, KeyboardArrowDown as ArrowDownIcon,
+  Facebook, Google, LinkedIn, Close as CloseIcon
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -18,7 +18,8 @@ function NavigationBar({ cartItemCount }) {
     categories: false
   });
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const [showSearchIcon, setShowSearchIcon] = React.useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
   const isSmallMobile = useMediaQuery('(max-width:480px)');
   const isLargeScreen = useMediaQuery('(min-width:1200px)');
@@ -33,6 +34,14 @@ function NavigationBar({ cartItemCount }) {
     { name: 'Sports', path: '/category/sports' },
   ];
 
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowSearchIcon(window.scrollY > 100);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleHover = (element, isHovering) => {
     setHoverStates(prev => ({ ...prev, [element]: isHovering }));
   };
@@ -41,8 +50,8 @@ function NavigationBar({ cartItemCount }) {
     setMobileMenuOpen(false);
   };
 
-  const toggleMobileSearch = () => {
-    setMobileSearchOpen(!mobileSearchOpen);
+  const toggleSearch = () => {
+    setSearchOpen(!searchOpen);
   };
 
   return (
@@ -107,19 +116,22 @@ function NavigationBar({ cartItemCount }) {
               </Typography>
             </Box>
 
-            {!isMobile && (
+            {/* Search Bar - appears when search icon is clicked */}
+            {searchOpen && !isMobile && (
               <Box sx={{
-                flex: 2,
-                px: 3,
-                display: 'flex',
-                justifyContent: 'center'
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '40%',
+                minWidth: '300px',
+                maxWidth: '500px',
+                zIndex: 1
               }}>
                 <Paper component="form" sx={{
-                  p: '4px 16px',
+                  p: '2px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   width: '100%',
-                  maxWidth: '600px',
                   borderRadius: '40px',
                   border: '1px solid',
                   borderColor: 'divider',
@@ -127,10 +139,17 @@ function NavigationBar({ cartItemCount }) {
                   '&:hover': { borderColor: '#FF6A00' }
                 }}>
                   <InputBase
-                    placeholder="Search 100M+ products..."
+                    placeholder="Search products..."
                     inputProps={{ 'aria-label': 'search' }}
                     sx={{ ml: 1, flex: 1, fontSize: '0.9rem' }}
+                    autoFocus
                   />
+                  <IconButton
+                    onClick={toggleSearch}
+                    sx={{ p: '8px', color: 'text.secondary' }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
                   <IconButton type="submit" sx={{ p: '8px', color: '#FF6A00' }}>
                     <SearchIcon fontSize="small" />
                   </IconButton>
@@ -142,29 +161,33 @@ function NavigationBar({ cartItemCount }) {
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
-              gap: isSmallMobile ? 1 : 1.5,
+              gap: isLargeScreen ? 2 : isSmallMobile ? 1 : 1.5,
               flexShrink: 0
             }}>
-              {isMobile && (
+              {/* Search Icon - shows when not searching or on mobile */}
+              {((showSearchIcon || isMobile) && !searchOpen) && (
                 <IconButton
-                  onClick={toggleMobileSearch}
+                  onClick={toggleSearch}
                   sx={{
                     color: 'text.primary',
                     '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                    p: isSmallMobile ? 0.75 : 1
+                    p: isSmallMobile ? 0.5 : 0.75
                   }}>
-                  <SearchIcon fontSize={isSmallMobile ? "medium" : "large"} />
+                  <SearchIcon fontSize={isSmallMobile ? "medium" : isLargeScreen ? "medium" : "large"} />
                 </IconButton>
               )}
 
-              <IconButton sx={{
-                color: 'text.primary',
-                '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                p: isSmallMobile ? 0.75 : 1,
-                display: { xs: 'none', sm: 'flex' }
-              }}>
-                <LanguageIcon fontSize={isSmallMobile ? "medium" : "large"} />
-              </IconButton>
+              <Tooltip title="Select your language" arrow>
+                <IconButton
+                  sx={{
+                    color: 'text.primary',
+                    '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
+                    p: isSmallMobile ? 0.5 : isLargeScreen ? 0.5 : 0.75,
+                    display: { xs: 'none', sm: 'flex' }
+                  }}>
+                  <LanguageIcon fontSize={isSmallMobile ? "medium" : isLargeScreen ? "medium" : "large"} />
+                </IconButton>
+              </Tooltip>
 
               {/* Cart */}
               <Box
@@ -176,20 +199,20 @@ function NavigationBar({ cartItemCount }) {
                 <IconButton sx={{
                   color: 'text.primary',
                   '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                  p: isSmallMobile ? 0.75 : 1
+                  p: isSmallMobile ? 0.5 : isLargeScreen ? 0.5 : 0.75
                 }}>
                   <Badge
                     badgeContent={cartItemCount}
                     color="primary"
                     sx={{
                       '& .MuiBadge-badge': {
-                        fontSize: isSmallMobile ? '0.7rem' : '0.8rem',
-                        height: isSmallMobile ? 18 : 20,
-                        minWidth: isSmallMobile ? 18 : 20,
+                        fontSize: isSmallMobile ? '0.6rem' : '0.7rem',
+                        height: isSmallMobile ? 16 : 18,
+                        minWidth: isSmallMobile ? 16 : 18,
                       }
                     }}
                   >
-                    <ShoppingCartIcon fontSize={isSmallMobile ? "medium" : "large"} />
+                    <ShoppingCartIcon fontSize={isSmallMobile ? "medium" : isLargeScreen ? "medium" : "large"} />
                   </Badge>
                 </IconButton>
               </Box>
@@ -204,9 +227,9 @@ function NavigationBar({ cartItemCount }) {
                 <IconButton sx={{
                   color: 'text.primary',
                   '&:hover': { backgroundColor: 'rgba(255,106,0,0.1)' },
-                  p: isSmallMobile ? 0.75 : 1
+                  p: isSmallMobile ? 0.5 : isLargeScreen ? 0.5 : 0.75
                 }}>
-                  <PersonIcon fontSize={isSmallMobile ? "medium" : "large"} />
+                  <PersonIcon fontSize={isSmallMobile ? "medium" : isLargeScreen ? "medium" : "large"} />
                 </IconButton>
               </Box>
 
@@ -216,11 +239,11 @@ function NavigationBar({ cartItemCount }) {
                 variant="contained"
                 sx={{
                   borderRadius: '20px',
-                  px: isSmallMobile ? 1.5 : 2,
-                  py: isSmallMobile ? 0.5 : 0.75,
+                  px: isSmallMobile ? 1.25 : isLargeScreen ? 1.5 : 2,
+                  py: isSmallMobile ? 0.4 : isLargeScreen ? 0.5 : 0.75,
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: isSmallMobile ? '0.8rem' : isLargeScreen ? '0.95rem' : '0.85rem',
+                  fontSize: isSmallMobile ? '0.75rem' : isLargeScreen ? '0.85rem' : '0.9rem',
                   minWidth: 'unset',
                   whiteSpace: 'nowrap',
                   background: 'linear-gradient(45deg, #FF6A00 30%, #FF9E00 90%)',
@@ -235,15 +258,14 @@ function NavigationBar({ cartItemCount }) {
           </Box>
 
           {/* Mobile Search Bar */}
-          {isMobile && mobileSearchOpen && (
+          {searchOpen && isMobile && (
             <Box sx={{
               width: '100%',
               px: 2,
               py: 1,
-              display: { xs: 'block', md: 'none' }
             }}>
               <Paper component="form" sx={{
-                p: '4px 16px',
+                p: '2px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 borderRadius: '40px',
@@ -259,7 +281,7 @@ function NavigationBar({ cartItemCount }) {
                   autoFocus
                 />
                 <IconButton
-                  onClick={toggleMobileSearch}
+                  onClick={toggleSearch}
                   sx={{ p: '8px', color: 'text.secondary' }}
                 >
                   <CloseIcon fontSize="small" />
@@ -282,28 +304,30 @@ function NavigationBar({ cartItemCount }) {
           }}>
             {!isMobile && (
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <ClickAwayListener onClickAway={() => handleHover('categories', false)}>
-                  <Box>
-                    <Button
-                      onMouseEnter={() => handleHover('categories', true)}
-                      startIcon={<CategoryIcon />}
-                      endIcon={<ArrowDownIcon fontSize="small" />}
-                      sx={{
-                        color: 'text.primary',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        px: 1,
-                        '&:hover': {
-                          backgroundColor: 'transparent'
-                        }
-                      }}
-                    >
-                      All Categories
-                    </Button>
+                <Box>
+                  <Button
+                    onMouseEnter={() => handleHover('categories', true)}
+                    onMouseLeave={() => handleHover('categories', false)}
+                    endIcon={<ArrowDownIcon fontSize="small" />}
+                    sx={{
+                      color: 'text.primary',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      px: 1,
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      }
+                    }}
+                  >
+                    All Categories
+                  </Button>
 
-                    <Fade in={hoverStates.categories} timeout={150}>
-                      <Paper sx={{
+                  <Fade in={hoverStates.categories} timeout={150}>
+                    <Paper
+                      onMouseEnter={() => handleHover('categories', true)}
+                      onMouseLeave={() => handleHover('categories', false)}
+                      sx={{
                         position: 'absolute',
                         top: '100%',
                         left: 0,
@@ -314,36 +338,36 @@ function NavigationBar({ cartItemCount }) {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                         border: '1px solid',
                         borderColor: 'divider'
-                      }}>
-                        <List dense>
-                          {categories.map((category) => (
-                            <ListItem
-                              button
-                              key={category.name}
-                              component={Link}
-                              to={category.path}
-                              onClick={() => handleHover('categories', false)}
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: 'rgba(255,106,0,0.1)'
-                                },
-                                color: 'text.primary',
-                                py: 1
-                              }}>
-                              <ListItemText
-                                primary={category.name}
-                                primaryTypographyProps={{
-                                  fontWeight: 500,
-                                  fontSize: '0.9rem'
-                                }}
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </Paper>
-                    </Fade>
-                  </Box>
-                </ClickAwayListener>
+                      }}
+                    >
+                      <List dense>
+                        {categories.map((category) => (
+                          <ListItem
+                            button
+                            key={category.name}
+                            component={Link}
+                            to={category.path}
+                            onClick={() => handleHover('categories', false)}
+                            sx={{
+                              '&:hover': {
+                                backgroundColor: 'rgba(255,106,0,0.1)'
+                              },
+                              color: 'text.primary',
+                              py: 1
+                            }}>
+                            <ListItemText
+                              primary={category.name}
+                              primaryTypographyProps={{
+                                fontWeight: 500,
+                                fontSize: '0.9rem'
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Paper>
+                  </Fade>
+                </Box>
 
                 <Button
                   component={Link}

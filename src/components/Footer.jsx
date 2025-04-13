@@ -5,7 +5,6 @@ import {
   Grid,
   Typography,
   Link,
-  Divider,
   IconButton
 } from '@mui/material';
 import {
@@ -28,7 +27,7 @@ const Footer = () => {
         backgroundColor: 'background.paper',
         color: 'text.primary',
         py: 6,
-        borderTop: '1px solid',
+        borderTop: 'none',
         borderColor: 'divider'
       }}
     >
@@ -179,16 +178,14 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 4 }} />
-
-        {/* Bottom Section */}
+        {/* Bottom Section - Removed the divider that was here */}
         <Box
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: 'center',
-            pt: 2
+            pt: 4
           }}
         >
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: { xs: 1, sm: 0 } }}>

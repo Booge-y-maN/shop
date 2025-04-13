@@ -1,3 +1,4 @@
+// home.jsx
 import * as React from 'react';
 import {
   Typography,
@@ -8,13 +9,16 @@ import {
   CircularProgress,
   Alert,
   Paper,
-  styled
+  styled,
+  InputBase,
+  IconButton
 } from '@mui/material';
 import Carousel from 'react-material-ui-carousel';
 import ProductCard from '../components/ProductCard';
 import summerSaleImage from '../assets/images/summer-sale.jpg';
 import techGadgetsImage from '../assets/images/tech-gadgets.jpg';
 import trendingFashionImage from '../assets/images/trending-fashion.jpg';
+import SearchIcon from '@mui/icons-material/Search';
 import '../App.css';
 
 const StyledCarousel = styled(Carousel)({
@@ -78,9 +82,43 @@ function Home({ products, addToCart, error, loading }) {
   ];
 
   return (
-    <Box sx={{ my: 4 }}>
+    <Box sx={{ my: 0 }}>
+      {/* Search Bar */}
+      <Box sx={{ 
+        backgroundColor: 'background.paper',
+        py: 2,
+        px: { xs: 2, sm: 3 },
+        borderBottom: '1px solid',
+        borderColor: 'divider'
+      }}>
+        <Container maxWidth="lg" sx={{ px: { xs: 0, sm: 2 } }}>
+          <Paper component="form" sx={{
+            p: '4px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto',
+            borderRadius: '40px',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: 'none',
+            '&:hover': { borderColor: '#FF6A00' }
+          }}>
+            <InputBase
+              placeholder="Search 100M+ products..."
+              inputProps={{ 'aria-label': 'search' }}
+              sx={{ ml: 1, flex: 1, fontSize: '0.9rem' }}
+            />
+            <IconButton type="submit" sx={{ p: '8px', color: '#FF6A00' }}>
+              <SearchIcon fontSize="small" />
+            </IconButton>
+          </Paper>
+        </Container>
+      </Box>
+
       {/* Hero Section */}
-      <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden', marginBottom: '2rem' }}>
+      <Paper elevation={3} sx={{ borderRadius: 0, overflow: 'hidden', marginBottom: '2rem', border: 'none' }}>
         <StyledCarousel
           animation="slide"
           autoPlay={true}
