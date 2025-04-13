@@ -3,17 +3,19 @@ import {
   Box,
   Button,
   Container,
-  Divider,
-  Grid,
   TextField,
   Typography,
   MenuItem,
-  Select
+  Select,
+  Checkbox,
+  FormControlLabel,
+  Link
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 // Country data with flag emojis
 const countries = [
+  { code: '', name: 'Select your country', flag: '' },
   { code: 'AL', name: 'Albania', flag: '🇦🇱' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
@@ -67,7 +69,62 @@ const countries = [
 ];
 
 export default function SupplierSignUp() {
-  const [country, setCountry] = React.useState('AL');
+  const [country, setCountry] = React.useState('');
+  const [formData, setFormData] = React.useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    captcha: '',
+    agreedToTerms: false
+  });
+  const [captchaText, setCaptchaText] = React.useState('');
+  const [userCaptcha, setUserCaptcha] = React.useState('');
+
+  // Generate a simple captcha on component mount
+  React.useEffect(() => {
+    generateCaptcha();
+  }, []);
+
+  const generateCaptcha = () => {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let captcha = '';
+    for (let i = 0; i < 6; i++) {
+      captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaText(captcha);
+    setUserCaptcha('');
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validate all fields are filled
+    if (!country || !formData.email || !formData.password ||
+        !formData.firstName || !formData.lastName ||
+        !formData.agreedToTerms || userCaptcha !== captchaText) {
+      alert('Please fill in all required fields, check the terms box, and complete the captcha correctly');
+      return;
+    }
+
+    // If all validations pass, proceed with form submission
+    console.log('Form submitted:', { country, ...formData });
+    // Here you would typically send the data to your backend
+  };
+
+  const isFormValid = () => {
+    return country && formData.email && formData.password &&
+           formData.firstName && formData.lastName &&
+           formData.agreedToTerms && userCaptcha === captchaText;
+  };
 
   return (
     <Container maxWidth="xs" sx={{ py: 4 }}>
@@ -80,90 +137,35 @@ export default function SupplierSignUp() {
       }}>
         {/* Header */}
         <Typography variant="h5" component="h1" sx={{
-          mb: 2,
+          mb: 3,
           fontWeight: 700,
           background: 'linear-gradient(to right, #FF6A00, #FF9E00)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
-          Become A Supplier
+          Sign up as a supplier
         </Typography>
 
-        {/* Location Field */}
-        <Select
-          fullWidth
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          variant="outlined"
-          sx={{ mt: 1, mb: 2, textAlign: 'left' }}
-        >
-          {countries.map((c) => (
-            <MenuItem key={c.code} value={c.code}>
-              {c.flag} {c.name}
-            </MenuItem>
-          ))}
-        </Select>
+        {/* Registration Form */}
+        <Box component="form" noValidate onSubmit={handleSubmit}>
+          {/* Location Field */}
+          <Typography variant="subtitle2" sx={{ textAlign: 'left', mb: 1 }}>Company location:</Typography>
+          <Select
+            fullWidth
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            variant="outlined"
+            sx={{ mb: 3, textAlign: 'left' }}
+            displayEmpty
+            required
+          >
+            {countries.map((c) => (
+              <MenuItem key={c.code || 'empty'} value={c.code}>
+                {c.flag} {c.name}
+              </MenuItem>
+            ))}
+          </Select>
 
-        {/* Social Sign Up */}
-        <Typography variant="body2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
-          Continue with
-        </Typography>
-
-        <Grid container spacing={1} sx={{ mb: 2 }}>
-          <Grid item xs={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                py: 1,
-                textTransform: 'none',
-                color: '#DB4437',
-                borderColor: '#DB4437',
-                '&:hover': { borderColor: '#DB4437', backgroundColor: 'rgba(219, 68, 55, 0.04)' }
-              }}
-            >
-              Google
-            </Button>
-          </Grid>
-          <Grid item xs={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                py: 1,
-                textTransform: 'none',
-                color: '#4267B2',
-                borderColor: '#4267B2',
-                '&:hover': { borderColor: '#4267B2', backgroundColor: 'rgba(66, 103, 178, 0.04)' }
-              }}
-            >
-              Facebook
-            </Button>
-          </Grid>
-          <Grid item xs={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                py: 1,
-                textTransform: 'none',
-                color: '#0077B5',
-                borderColor: '#0077B5',
-                '&:hover': { borderColor: '#0077B5', backgroundColor: 'rgba(0, 119, 181, 0.04)' }
-              }}
-            >
-              LinkedIn
-            </Button>
-          </Grid>
-        </Grid>
-
-        {/* Divider */}
-        <Divider sx={{ my: 2 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>OR</Typography>
-        </Divider>
-
-        {/* Email Form */}
-        <Box component="form" noValidate>
           <TextField
             margin="normal"
             required
@@ -173,6 +175,96 @@ export default function SupplierSignUp() {
             name="email"
             autoComplete="email"
             size="small"
+            value={formData.email}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="password"
+            label="Password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            size="small"
+            value={formData.password}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="firstName"
+            label="First name"
+            name="firstName"
+            autoComplete="given-name"
+            size="small"
+            value={formData.firstName}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="lastName"
+            label="Last name"
+            name="lastName"
+            autoComplete="family-name"
+            size="small"
+            value={formData.lastName}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+
+          {/* Simple Captcha */}
+          <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold', letterSpacing: '3px' }}>
+              {captchaText}
+            </Typography>
+            <TextField
+              fullWidth
+              required
+              label="Enter the text above"
+              value={userCaptcha}
+              onChange={(e) => setUserCaptcha(e.target.value)}
+              size="small"
+            />
+            <Button
+              size="small"
+              sx={{ mt: 1, fontSize: '0.75rem' }}
+              onClick={generateCaptcha}
+            >
+              Refresh Captcha
+            </Button>
+          </Box>
+
+          {/* Terms and conditions */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="agreedToTerms"
+                checked={formData.agreedToTerms}
+                onChange={handleChange}
+                color="primary"
+                required
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+                I agree to the{' '}
+                <Link href="#" sx={{ color: '#FF6A00' }}>Free Membership Agreement</Link>,{' '}
+                <Link href="#" sx={{ color: '#FF6A00' }}>Terms of Use</Link>, and{' '}
+                <Link href="#" sx={{ color: '#FF6A00' }}>Privacy Policy</Link>{' '}
+                of loremzy.com. I agree to receive more information about the platform's products and services.
+              </Typography>
+            }
             sx={{ mb: 2 }}
           />
 
@@ -180,24 +272,29 @@ export default function SupplierSignUp() {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={!isFormValid()}
             sx={{
               mt: 1,
-              py: 1,
+              py: 1.5,
               borderRadius: 1,
               background: 'linear-gradient(to right, #FF6A00, #FF9E00)',
               '&:hover': {
                 background: 'linear-gradient(to right, #E65A00, #E68E00)',
+              },
+              '&:disabled': {
+                background: '#e0e0e0',
+                color: '#a0a0a0'
               }
             }}
           >
-            Continue
+            Sign Up
           </Button>
         </Box>
 
         {/* Sign In Link */}
-        <Typography variant="body2" sx={{ mt: 2, fontSize: '0.75rem' }}>
+        <Typography variant="body2" sx={{ mt: 3, fontSize: '0.75rem' }}>
           Already have an account?{' '}
-          <Link to="/supplier/login" style={{
+          <RouterLink to="/supplier/login" style={{
             color: '#FF6A00',
             fontWeight: 600,
             textDecoration: 'none',
@@ -206,7 +303,7 @@ export default function SupplierSignUp() {
             }
           }}>
             Sign in
-          </Link>
+          </RouterLink>
         </Typography>
       </Box>
     </Container>
